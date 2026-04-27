@@ -89,8 +89,10 @@ export default function Recorder({ onResult }: RecorderProps) {
       }
 
       onResult({ ...analysis, transcript: speech.transcript, pitchSummary, duration: timer })
-    } catch {
-      setError('Analysis failed. Check your API key and try again.')
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.error('[440i18n] Analysis error:', msg)
+      setError(msg)
     }
     setAnalyzing(false)
   }
@@ -167,7 +169,7 @@ export default function Recorder({ onResult }: RecorderProps) {
       )}
 
       {error && (
-        <div style={{ background: '#FCEBEB', borderRadius: 8, padding: '10px 12px', fontSize: 13, color: '#A32D2D' }}>
+        <div style={{ background: '#FCEBEB', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: '#A32D2D', wordBreak: 'break-word' }}>
           {error}
         </div>
       )}
