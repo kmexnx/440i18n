@@ -32,7 +32,7 @@ Filler words are symptoms. The root cause is pitch instability, incoherent struc
 
 | Layer | License | What it is |
 |-------|---------|-----------|
-| `src/engine` | MIT | Pitch detector, speech recognition hooks, LLM analyzer, provider adapters |
+| `src/hooks` + `src/lib` | MIT | Pitch detector, speech recognition hooks, LLM analyzer, provider adapters |
 | `src/pages` + Supabase | MIT | Reference UI and schema |
 | 440i18n SaaS *(coming)* | Commercial | Historical dashboard, longitudinal pattern detection, team analytics, white-label for coaches |
 
@@ -44,35 +44,36 @@ The engine is yours. The training suite is the product.
 
 ```
 src/
-├── engine/
-│   ├── PitchDetector.js      ← Web Audio API, raw autocorrelation FFT, A₄ reference
-│   ├── SpeechRecognizer.js   ← Web Speech API wrapper, continuous + interim results
-│   └── analyze.js            ← LLM prompt engine, provider-agnostic adapter
+├── hooks/
+│   ├── usePitchDetector.ts     ← Web Audio API, raw autocorrelation FFT, A₄ reference
+│   └── useSpeechRecognition.ts ← Web Speech API wrapper, continuous + interim results
 ├── lib/
-│   ├── providers/
-│   │   ├── anthropic.js
-│   │   ├── openai.js
-│   │   ├── gemini.js
-│   │   └── ollama.js         ← local inference, no API key needed
-│   └── supabase.js
+│   ├── analyze.ts              ← LLM prompt engine, provider-agnostic adapter
+│   ├── types.ts                ← Shared TypeScript interfaces
+│   ├── supabase.ts             ← Supabase client
+│   └── providers/
+│       ├── anthropic.ts
+│       ├── openai.ts
+│       ├── gemini.ts
+│       └── ollama.ts           ← local inference, no API key needed
 └── pages/
-    ├── Recorder.jsx
-    └── Results.jsx
+    ├── Recorder.tsx
+    └── Results.tsx
 ```
 
-The pitch detector implements autocorrelation on a 2048-sample Float32Array buffer. No external DSP libraries. If you want to understand how it works, read `src/engine/PitchDetector.js` — it's ~80 lines.
+The pitch detector implements autocorrelation on a 2048-sample `Float32Array` buffer. No external DSP libraries. If you want to understand how it works, read `src/hooks/usePitchDetector.ts` — it's ~80 lines.
 
 ---
 
 ## Stack
 
 ```
-React + Vite          → UI
-Web Audio API         → Real-time pitch (raw FFT, no libs)
-Web Speech API        → Transcription, 5 languages
-Supabase              → Auth + Postgres + RLS + pgvector (ready)
-Any LLM provider      → Anthropic, OpenAI, Gemini, Ollama
-Vercel                → Deploy
+React + Vite + TypeScript → UI
+Web Audio API             → Real-time pitch (raw FFT, no libs)
+Web Speech API            → Transcription, 5 languages
+Supabase                  → Auth + Postgres + RLS + pgvector (ready)
+Any LLM provider          → Anthropic, OpenAI, Gemini, Ollama
+Vercel                    → Deploy
 ```
 
 ---
@@ -101,7 +102,7 @@ Your data stays yours. Supabase handles auth and storage — create a free proje
 |----------|--------|-----------------|
 | Anthropic | claude-sonnet-4-*, claude-opus-4-* | ~$0.01 |
 | OpenAI | gpt-4o, gpt-4o-mini | ~$0.01 |
-| Gemini | gemini-2.0-flash, gemini-1.5-pro | ~$0.001 |
+| Gemini | gemini-2.0-flash, gemini-2.0-flash-lite | ~$0.001 |
 | Ollama | llama3.2, mistral, qwen2.5, any local | $0.00 |
 
 ---
@@ -145,6 +146,7 @@ No migration hell. The schema anticipated it.
 - [x] Multi-language speech recognition
 - [x] LLM analysis — 6 metrics, evidence-based
 - [x] Multi-provider adapter (Anthropic, OpenAI, Gemini, Ollama)
+- [x] TypeScript — strict mode, full type coverage
 - [x] Supabase schema with RLS + pgvector-ready
 - [ ] Session history + progress charts
 - [ ] Longitudinal pattern detection
@@ -159,9 +161,9 @@ No migration hell. The schema anticipated it.
 
 The prompt is the product. If you have a better model for measuring empathy from text, prove it in a PR.
 
-New provider: add a file to `src/lib/providers/` and a case to `src/lib/analyze.js`.
+New provider: add a file to `src/lib/providers/` and a case to `src/lib/analyze.ts`.
 
-New language: add a `{ code, label }` entry to `LANGS` in `Recorder.jsx` and open a PR.
+New language: add a `{ code, label }` entry to `LANGS` in `Recorder.tsx` and open a PR.
 
 ---
 
