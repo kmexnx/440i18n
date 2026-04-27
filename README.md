@@ -1,3 +1,5 @@
+<img src="docs/banner.svg" alt="440i18n banner" width="100%"/>
+
 # 440i18n
 
 > *A₄ = 440 Hz. The reference pitch. The anchor. Everything else is deviation.*
